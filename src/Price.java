@@ -20,6 +20,10 @@ public class Price {
         return price;
     }
 
+    public double getOriginalPrice() {
+        return originalPrice;
+    }
+
     @Override
     public String toString() {
         return " (" + this.originalPrice + " " + country.currencySymbol + ")";

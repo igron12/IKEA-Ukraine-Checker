@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class CountriesChecker {
     ArrayList<Country> list = new ArrayList<>(Arrays.asList(new Ukraine(), new Poland(), new USA(),
-            new UK(), new Slovakia(), new Germany(), new Croatia(), new Sweden(), new Canada()));
+            new UK(), new Slovakia(), new Germany(), new Croatia(), new Sweden(), new Canada(), new Czechia()));
 
     public void check(String name) {
         Item item = new Item();

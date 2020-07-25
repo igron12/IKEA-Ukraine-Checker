@@ -8,33 +8,35 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 public class Item {
-    String link;
+    String link;        //format https://www.ikea.com/ua/uk/p/-20011408
     String baseCreator = "https://www.ikea.com/";
-    TreeMap<Double, String> map = new TreeMap<>();
-    ArrayList<String> notAvailable = new ArrayList<>();
+    TreeMap<Double, InfoBook> map = new TreeMap<>();  //contains price (double) and country + base price
+    ArrayList<String> notAvailable = new ArrayList<>(); //country name added here when article not found here
 
-    public void check(Country item, String name) {
-        link = baseCreator + item.id + "/" + item.lang + "/p/-" + name;
+    public void check(Country country, String article) {
+        link = baseCreator + country.id + "/" + country.lang + "/p/-" + article;
         try {
             Document doc = Jsoup.connect(link).execute().parse();
 
             //Price
-            Price local = new Price(doc, item);
-            map.put(local.get(), item.countryName + local.toString());
-
             //Rating
-            map.put(local.get(), map.get(local.price) + new Rating(doc));
+            InfoBook infoBook = new InfoBook(country, new Price(doc, country), new Rating(doc));
 
+            map.put(infoBook.getPrice(), infoBook);
         } catch (HttpStatusException e) {
-            notAvailable.add(item.countryName);
+            notAvailable.add(country.countryName);
         } catch (NumberFormatException e) {
             System.out.println("NumberFormatException " + e.getLocalizedMessage());
         } catch (Exception ignored) {}
     }
 
     public void writeResult() {
+        //price message    country (original price and symbol) stars   score   (qty)
+        //179   грн in      Ukraine (179.0 ₴)                   ★★★★    4.8     (233)
+
         for (Double price : map.keySet()) {
-            System.out.println((int) Math.round(price) + " грн in " + map.get(price));
+            InfoBook infoBook = map.get(price);
+            infoBook.printInfo();
         }
 
         if (notAvailable.size() > 0) System.out.println("Product is not available in " + notAvailable.stream().map(Object::toString).collect(Collectors.joining(", ")));
