@@ -1,4 +1,5 @@
 import countries.*;
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -9,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class CountriesChecker {
     ArrayList<Country> list = new ArrayList<>(Arrays.asList(new Ukraine(), new Poland(), new USA(),
-            new UK(), new Slovakia(), new Germany()));
+            new UK(), new Slovakia(), new Germany(), new Croatia(), new Sweden(), new Canada()));
     TreeMap<Double, String> map;
     ArrayList<String> notAvailable;
 
@@ -23,28 +24,20 @@ public class CountriesChecker {
         {
             try {
                 Document doc = Jsoup.connect(baseCreator + item.id + "/" + item.lang + "/p/-" + name).execute().parse();
-                String local = doc.getElementsByClass(item.className).first().text()
-                        .replace(",", ".")
-                        //.replaceAll("[^[0-9]([.][0-9]{1,2})]","");
-                        .replace(".-","")
-                        .replace("$", "").replace("€", "").replace(" ", "")
-                        .replace("грн", "").replace("£", "")
-                        ;
-                        //System.out.println(local);
-                double total = Double.parseDouble(local) * item.rate;
-                map.put(total, item.countryName + " (" + local + " " + item.currencySymbol + ")");
+
+                //Price
+                Price local = new Price(doc, item);
+                map.put(local.get(), item.countryName + local.toString());
 
                 //Rating
-                try {
-                    map.put(total, map.get(total) + new Rating(doc));
-                } catch (Exception ignored) {}
+                map.put(local.get(), map.get(local.price) + new Rating(doc));
 
-            } catch (Exception e) {
+            } catch (HttpStatusException e) {
                 notAvailable.add(item.countryName);
-                //e.printStackTrace();
-            }
+            } catch (NumberFormatException e) {
+                System.out.println("NumberFormatException " + e.getLocalizedMessage());
+            } catch (Exception ignored) {}
 
-            //^\d*\[.,]?\d*$
         });
 
         writeResult();
