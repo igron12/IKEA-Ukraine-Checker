@@ -22,6 +22,7 @@ public class CountriesChecker {
 
         list.parallelStream().forEach(item->
         {
+
             try {
                 Document doc = Jsoup.connect(baseCreator + item.id + "/" + item.lang + "/p/-" + name).execute().parse();
 

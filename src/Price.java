@@ -9,6 +9,7 @@ public class Price {
     public Price(Document doc, Country countryItem) {
         String stringPrice = doc.getElementsByClass(countryItem.className).first().text();
         if (stringPrice.contains("/")) stringPrice = stringPrice.split("/")[0];
+        if (countryItem.equals(new Croatia())) stringPrice = stringPrice.replace(".", "");
         stringPrice = stringPrice.replace(",", ".").replaceAll("[^0-9.]","");
         this.originalPrice = Double.parseDouble(stringPrice);
         this.price = originalPrice * countryItem.rate;

@@ -13,6 +13,7 @@ public class Rating {
 
     @Override
     public String toString() {
+        if (ratingQty.equals("(0)")) return "";
         stars = IntStream.iterate(1, i -> i <= Double.parseDouble(ratingScore), i -> i + 1)
                 .mapToObj(i -> "★").collect(Collectors.joining("", " ", ""));
         return stars + this.ratingScore + " " + ratingQty;
